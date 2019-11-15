@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import db from '../fire'
 import './Map.css';
 import FindACourt from "./FindACourt"
+import 'firebase/firestore';
 
 const MyLocation = () => <Icon circular inverted color="teal" name="map pin" />;
 const API_KEY = `${process.env.REACT_APP_GOOGLE_PLACES_API_KEY}`;
@@ -39,6 +40,7 @@ class Map extends Component {
         showCourts: true
       })
     );
+
     // pull data from database to have courts ready for display when component is ready
     db.collection('courts').get()
       .then(querySnapshot => {
@@ -46,16 +48,20 @@ class Map extends Component {
         querySnapshot.forEach(function(doc) {
           Courts.push({
             address: doc.data().address,
+            avgRating: doc.data().avgRating,
+            ratings: doc.data().ratings,
             image: doc.data().image,
             latitude: doc.data().latitude,
             longitude: doc.data().longitude,
             mapsURL: doc.data().mapsURL,
             name: doc.data().name,
+            indoor: doc.data().indoor,
             zip: doc.data().zip,
             gameDateTime: doc.data().dateTime,
             id: doc.id
           })
         })
+        console.log(Courts);
         this.setState({ Courts })
       })
       .catch(function(error) {
@@ -70,11 +76,14 @@ class Map extends Component {
         querySnapshot.forEach(function(doc) {
           Courts.push({
             address: doc.data().address,
+            avgRating: doc.data().avgRating,
+            ratings: doc.data().ratings,
             image: doc.data().image,
             latitude: doc.data().latitude,
             longitude: doc.data().longitude,
             mapsURL: doc.data().mapsURL,
             name: doc.data().name,
+            indoor: doc.data().indoor,
             zip: doc.data().zip,
             gameDateTime: doc.data().dateTime,
             id: doc.id
@@ -102,7 +111,10 @@ class Map extends Component {
               lat={court.latitude}
               lng={court.longitude}
               name={court.name}
+              indoor={court.indoor}
               address={court.address}
+              avgRating={court.avgRating}
+              numRatings={court.ratings == null ? 0 : court.ratings.length}
               image={court.image}
               url={court.mapsURL}
               gameDateTime={court.gameDateTime}
